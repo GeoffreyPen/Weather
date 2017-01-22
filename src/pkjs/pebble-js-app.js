@@ -13,13 +13,23 @@ function iconFromWeatherId(weatherId) {
 }
 
 function fetchWeather(latitude, longitude) {
-  //var req = new XMLHttpRequest();
-  //req.open('GET', 'http://api.openweathermap.org/data/2.5/weather?' +
-  //  'lat=' + latitude + '&lon=' + longitude + '&cnt=1&appid=' + myAPIKey, true);
-  //req.onload = function () {
-  //  if (req.readyState === 4) {
-  //    if (req.status === 200) {
-   //     console.log(req.responseText);
+  var req = new XMLHttpRequest();
+  req.open('GET', 'http://api.translink.ca/rttiapi/v1/stops?apikey=M5uO4PdfDGgA0b7TIKjj&lat=49.248523&long=-123.108800&radius=500',true);
+  req.onload = function () {
+    if (req.readyState === 4) {
+      if (req.status === 200) {
+        console.log(req.responseText);
+          console.log('lat= ' + latitude + ' lon= ' + longitude);
+        Pebble.sendAppMessage({
+          //'WEATHER_ICON_KEY': icon,
+          'WEATHER_TEMPERATURE_KEY': latitude,
+          'WEATHER_CITY_KEY': longitude
+        });
+      }
+   }
+  };
+  //http://api.translink.ca/rttiapi/v1/stops?apikey=M5uO4PdfDGgA0b7TIKjj&lat=49.248523&long=-123.108800&radius=500
+    req.send(null);
    //     var response = JSON.parse(req.responseText);
    //     var temperature = Math.round(response.main.temp - 273.15);
    //     var icon = iconFromWeatherId(response.weather[0].id);
@@ -27,12 +37,7 @@ function fetchWeather(latitude, longitude) {
     //    console.log(temperature);
     //    console.log(icon);
     //    console.log(city);
-  console.log('lat= ' + latitude + ' lon= ' + longitude);
-        Pebble.sendAppMessage({
-          //'WEATHER_ICON_KEY': icon,
-          'WEATHER_TEMPERATURE_KEY': latitude,
-          'WEATHER_CITY_KEY': longitude
-        });
+
       //} else {
        // console.log('Error');
       //}
