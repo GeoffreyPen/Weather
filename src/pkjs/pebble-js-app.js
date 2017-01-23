@@ -14,12 +14,19 @@ function iconFromWeatherId(weatherId) {
 
 function fetchWeather(latitude, longitude) {
   var req = new XMLHttpRequest();
-  req.open('GET', 'http://api.translink.ca/rttiapi/v1/stops?apikey=M5uO4PdfDGgA0b7TIKjj&lat=49.248523&long=-123.108800&radius=500',true);
+  console.log('lat2= ' + latitude + ' lon2= ' + longitude);
+  var lat= 49.248523;
+  var long = -123.101606;
+  //var lat=(''+latitude).substring(0,(""+latitude).indexOf(".")+7);
+  //var long=(''+longitude).substring(0,(""+longitude).indexOf(".")+7);
+  console.log('lati= ' + lat + ' long= ' + long);
+  req.open('GET', 'http://api.translink.ca/rttiapi/v1/stops?apikey=M5uO4PdfDGgA0b7TIKjj&lat=' + lat + '&long=' + long + '&radius=10',true);
+ // req.open('GET', 'http://api.translink.ca/rttiapi/v1/stops?apikey=M5uO4PdfDGgA0b7TIKjj&lat=49.248523&long=-123.108800&radius=10',true);
   req.onload = function () {
     if (req.readyState === 4) {
       if (req.status === 200) {
         console.log(req.responseText);
-          console.log('lat= ' + latitude + ' lon= ' + longitude);
+          console.log('lat3= ' + latitude + ' lon3= ' + longitude);
         Pebble.sendAppMessage({
           //'WEATHER_ICON_KEY': icon,
           'WEATHER_TEMPERATURE_KEY': latitude,
