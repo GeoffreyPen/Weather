@@ -43,15 +43,15 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
 
     case WEATHER_TEMPERATURE_KEY:
       // App Sync keeps new_tuple in s_sync_buffer, so we may use it directly
-    
-      snprintf(test, sizeof(test), "  %d Latitude", (int)new_tuple->value->int32);
+      snprintf(test, sizeof(test),new_tuple->value->cstring);
+      //snprintf(test, sizeof(test), "  %d Latitude", (int)new_tuple->value->int32);
       text_layer_set_text(s_temperature_layer,test);
       //text_layer_set_text(s_temperature_layer, new_tuple->value->int32;
       break;
 
     case WEATHER_CITY_KEY:
       //text_layer_set_text(s_city_layer, new_tuple->value->int32;
-          snprintf(test2, sizeof(test2), "  %d Longitude", (int)new_tuple->value->int32);
+          snprintf(test2, sizeof(test2),new_tuple->value->cstring);
       text_layer_set_text(s_city_layer,test2);
                 
       break;
