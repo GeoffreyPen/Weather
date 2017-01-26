@@ -18,7 +18,7 @@ enum WeatherKey {
   WEATHER_ICON_KEY = 0x0,         // TUPLE_INT
   WEATHER_TEMPERATURE_KEY = 0x1,  // TUPLE_CSTRING
   WEATHER_CITY_KEY = 0x2,         // TUPLE_CSTRING
-  WEATHER_ROUTE_KEY = 0x3,         // TUPLE_CSTRING
+  WEATHER_ROUTE_KEY = 0x3        // TUPLE_CSTRING
 };
 
 static const uint32_t WEATHER_ICONS[] = {
@@ -33,10 +33,12 @@ static void sync_error_callback(DictionaryResult dict_error, AppMessageResult ap
 }
 
 static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tuple, const Tuple* old_tuple, void* context) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi4");
   switch (key) {
    
-    /*
+    
     case WEATHER_ICON_KEY:
+    APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi10");
       if (s_icon_bitmap) {
         gbitmap_destroy(s_icon_bitmap);
       }
@@ -45,8 +47,9 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
       bitmap_layer_set_compositing_mode(s_icon_layer, GCompOpSet);
       bitmap_layer_set_bitmap(s_icon_layer, s_icon_bitmap);
       break;
-    */
+    
     case WEATHER_TEMPERATURE_KEY:
+    APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi9");
       // App Sync keeps new_tuple in s_sync_buffer, so we may use it directly
       snprintf(test, sizeof(test),new_tuple->value->cstring);
       //snprintf(test, sizeof(test), "  %d Latitude", (int)new_tuple->value->int32);
@@ -55,6 +58,7 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
       break;
 
     case WEATHER_CITY_KEY:
+    APP_LOG(APP_LOG_LEVEL_DEBUG,"H11");
       //text_layer_set_text(s_city_layer, new_tuple->value->int32;
           snprintf(test2, sizeof(test2),new_tuple->value->cstring);
       text_layer_set_text(s_city_layer,test2);
@@ -62,7 +66,7 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
       break;
     
     case WEATHER_ROUTE_KEY:
-    APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi");
+   APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi5");
       //text_layer_set_text(s_city_layer, new_tuple->value->int32;
           snprintf(test3, sizeof(test3),new_tuple->value->cstring);
       text_layer_set_text(s_route_layer,test3);
@@ -73,6 +77,7 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
 }
 
 static void request_weather(void) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi7");
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
 
@@ -86,14 +91,16 @@ static void request_weather(void) {
   dict_write_end(iter);
 
   app_message_outbox_send();
+  APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi8");
 }
 
 static void window_load(Window *window) {
+     APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi1");
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  //s_icon_layer = bitmap_layer_create(GRect(0, 10, bounds.size.w, 80));
-  //layer_add_child(window_layer, bitmap_layer_get_layer(s_icon_layer));
+  s_icon_layer = bitmap_layer_create(GRect(0, 10, bounds.size.w, 80));
+  layer_add_child(window_layer, bitmap_layer_get_layer(s_icon_layer));
 
 
   
@@ -123,25 +130,27 @@ static void window_load(Window *window) {
     
     TupletCString(WEATHER_TEMPERATURE_KEY, "Loading Data"),
     TupletCString(WEATHER_CITY_KEY, "Retry After 30s"),
-    TupletCString(WEATHER_ROUTE_KEY, "HELLOW WORLD!"),
+    TupletCString(WEATHER_ROUTE_KEY, "HELLOW WORLD!")
+    
   };
-
+APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi2");
   app_sync_init(&s_sync, s_sync_buffer, sizeof(s_sync_buffer),
       initial_values, ARRAY_LENGTH(initial_values),
       sync_tuple_changed_callback, sync_error_callback, NULL);
 
   request_weather();
+  APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi3");
 }
 
 static void window_unload(Window *window) {
   if (s_icon_bitmap) {
-    //gbitmap_destroy(s_icon_bitmap);
+    gbitmap_destroy(s_icon_bitmap);
   }
 
   text_layer_destroy(s_route_layer);
   text_layer_destroy(s_city_layer);
   text_layer_destroy(s_temperature_layer);
-  //bitmap_layer_destroy(s_icon_layer);
+  bitmap_layer_destroy(s_icon_layer);
 }
 
 static void init(void) {

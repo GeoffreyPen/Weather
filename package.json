@@ -4,6 +4,9 @@
     "keywords": [],
     "name": "pebblejs-weather",
     "pebble": {
+        "capabilities": [
+            "location"
+        ],
         "displayName": "PebbleJS Weather",
         "enableMultiJS": false,
         "messageKeys": {
