@@ -17,6 +17,7 @@ function fetchWeather(latitude, longitude) {
   var req2 = new XMLHttpRequest();
   var stop="";
   var time="";
+  var route="";
   console.log('lat2= ' + latitude + ' lon2= ' + longitude);
   //var lat= 49.248523;
   //var long = -123.101606;
@@ -39,16 +40,20 @@ function fetchWeather(latitude, longitude) {
       if (req2.status === 200) {
           //<ExpectedCountdown>2</ExpectedCountdown>
         time=(req2.responseText).substring((req2.responseText).indexOf("<ExpectedCountdown>")+19,(req2.responseText).indexOf("</ExpectedCountdown>"));
+        route=(req2.responseText).substring((req2.responseText).indexOf("<RouteNo>")+9,(req2.responseText).indexOf("</RouteNo>"));
+        //<RouteNo>003<Direction></Direction>
           console.log(req2.responseText);
-        console.log(time);
+        console.log("Route"+route);
         //console.log('lat3= ' + latitude + ' lon3= ' + longitude);
         Pebble.sendAppMessage({
           //'WEATHER_ICON_KEY': icon,
           
 //http://api.translink.ca/rttiapi/v1/stops/60980/estimates?apikey=M5uO4PdfDGgA0b7TIKjj&count=1
           
-           'WEATHER_TEMPERATURE_KEY': stop,
-          'WEATHER_CITY_KEY': time
+          'WEATHER_TEMPERATURE_KEY': "STOP: "+ stop,
+          'WEATHER_CITY_KEY': "ETA: "+ time + " MINS",
+          'WEATHER_ROUTE_KEY': "ROUTE: "+ route,
+          console.log(WEATHER_ROUTE_KEY);
           //'WEATHER_TEMPERATURE_KEY': latitude,
           //'WEATHER_CITY_KEY': longitude
         });

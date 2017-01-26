@@ -9,6 +9,7 @@
         "messageKeys": {
             "WEATHER_CITY_KEY": 2,
             "WEATHER_ICON_KEY": 0,
+            "WEATHER_ROUTE_KEY": 3,
             "WEATHER_TEMPERATURE_KEY": 1
         },
         "projectType": "native",
