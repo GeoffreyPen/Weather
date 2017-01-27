@@ -50,8 +50,8 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
       }
 
       s_icon_bitmap = gbitmap_create_with_resource(WEATHER_ICONS[new_tuple->value->uint8]);
-      bitmap_layer_set_compositing_mode(s_icon_layer, GCompOpSet);
-      bitmap_layer_set_bitmap(s_icon_layer, s_icon_bitmap);
+      //bitmap_layer_set_compositing_mode(s_icon_layer, GCompOpSet);
+      //bitmap_layer_set_bitmap(s_icon_layer, s_icon_bitmap);
       break;
     
     case WEATHER_TEMPERATURE_KEY:
@@ -135,9 +135,9 @@ static void window_load(Window *window) {
   Tuplet initial_values[] = {
     TupletInteger(WEATHER_ICON_KEY, (uint8_t) 1),
     
-    TupletCString(WEATHER_TEMPERATURE_KEY, "Loading Data"),
-    TupletCString(WEATHER_CITY_KEY, "Retry After 30s"),
-    TupletCString(WEATHER_ROUTE_KEY, "HELLOW WORLD!")
+    TupletCString(WEATHER_TEMPERATURE_KEY, "Retry After 30s"),
+    TupletCString(WEATHER_CITY_KEY, ""),
+    TupletCString(WEATHER_ROUTE_KEY, "Loading Data")
     
   };
 //APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi2");
