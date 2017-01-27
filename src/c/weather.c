@@ -4,12 +4,13 @@ static Window *s_main_window;
 
 static TextLayer *s_temperature_layer;
 static TextLayer *s_city_layer;
-static BitmapLayer *s_icon_layer;
 static TextLayer *s_route_layer;
+static BitmapLayer *s_icon_layer;
+
 static GBitmap *s_icon_bitmap = NULL;
 
 static AppSync s_sync;
-static uint8_t s_sync_buffer[64];
+static uint8_t s_sync_buffer[128];
 static char test2[50];
 static char test[50];
 static char test3[50];
@@ -30,6 +31,11 @@ static const uint32_t WEATHER_ICONS[] = {
 
 static void sync_error_callback(DictionaryResult dict_error, AppMessageResult app_message_error, void *context) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "App Message Sync Error: %d", app_message_error);
+}
+
+static void inbox_dropped_callback(AppMessageResult reason, void *context) {
+  // A message was received, but had to be dropped
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped. Reason: %d", (int)reason);
 }
 
 static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tuple, const Tuple* old_tuple, void* context) {
@@ -66,9 +72,10 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
       break;
     
     case WEATHER_ROUTE_KEY:
-   APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi5");
+
       //text_layer_set_text(s_city_layer, new_tuple->value->int32;
           snprintf(test3, sizeof(test3),new_tuple->value->cstring);
+      APP_LOG(APP_LOG_LEVEL_DEBUG,test3);
       text_layer_set_text(s_route_layer,test3);
                 
       break;
@@ -133,13 +140,13 @@ static void window_load(Window *window) {
     TupletCString(WEATHER_ROUTE_KEY, "HELLOW WORLD!")
     
   };
-APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi2");
+//APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi2");
   app_sync_init(&s_sync, s_sync_buffer, sizeof(s_sync_buffer),
       initial_values, ARRAY_LENGTH(initial_values),
       sync_tuple_changed_callback, sync_error_callback, NULL);
 
   request_weather();
-  APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi3");
+  //APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi3");
 }
 
 static void window_unload(Window *window) {
@@ -162,7 +169,7 @@ static void init(void) {
   });
   window_stack_push(s_main_window, true);
 
-  app_message_open(64, 64);
+  app_message_open(128, 128);
 }
 
 static void deinit(void) {

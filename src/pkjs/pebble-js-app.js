@@ -18,6 +18,7 @@ function fetchWeather(latitude, longitude) {
   var stop="";
   var time="";
   var route="";
+  var direction="";
   console.log('lat2= ' + latitude + ' lon2= ' + longitude);
   //var lat= 49.248523;
   //var long = -123.101606;
@@ -41,6 +42,7 @@ function fetchWeather(latitude, longitude) {
           //<ExpectedCountdown>2</ExpectedCountdown>
         time=(req2.responseText).substring((req2.responseText).indexOf("<ExpectedCountdown>")+19,(req2.responseText).indexOf("</ExpectedCountdown>"));
         route=(req2.responseText).substring((req2.responseText).indexOf("<RouteNo>")+9,(req2.responseText).indexOf("</RouteNo>"));
+        direction=(req2.responseText).substring((req2.responseText).indexOf("<Direction>")+11,(req2.responseText).indexOf("<Direction>")+12);
         //<RouteNo>003<Direction></Direction>
           console.log(req2.responseText);
         console.log("Route"+route);
@@ -52,8 +54,8 @@ function fetchWeather(latitude, longitude) {
           
           'WEATHER_TEMPERATURE_KEY': "STOP: "+ stop,
           'WEATHER_CITY_KEY': "ETA: "+ time + " MINS",
-          'WEATHER_ROUTE_KEY': "ROUTE: "+ route,
-          console.log(WEATHER_ROUTE_KEY);
+          'WEATHER_ROUTE_KEY': "ROUTE: "+ route +" "+direction,
+          //console.log(WEATHER_ROUTE_KEY);
           //'WEATHER_TEMPERATURE_KEY': latitude,
           //'WEATHER_CITY_KEY': longitude
         });
