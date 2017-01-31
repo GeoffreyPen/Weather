@@ -1,10 +1,13 @@
 #include "pebble.h"
+#include <time.h>
+#include <inttypes.h>
 
 static Window *s_main_window;
 
 static TextLayer *s_temperature_layer;
 static TextLayer *s_city_layer;
 static TextLayer *s_route_layer;
+static TextLayer *s_time_layer;
 static BitmapLayer *s_icon_layer;
 
 static GBitmap *s_icon_bitmap = NULL;
@@ -14,6 +17,12 @@ static uint8_t s_sync_buffer[128];
 static char test2[50];
 static char test[50];
 static char test3[50];
+//static struct tm s_last_time;
+static struct tm s_time;
+char *asctime(const struct tm *clock);
+  //time_t ttt = time(NULL);
+    //struct tm *time_now = localtime(&ttt);
+static char label[12];
 
 enum WeatherKey {
   WEATHER_ICON_KEY = 0x0,         // TUPLE_INT
@@ -29,6 +38,25 @@ static const uint32_t WEATHER_ICONS[] = {
   RESOURCE_ID_IMAGE_SNOW // 3
 };
 
+static void update_time() {
+  // Get a tm structure
+  time_t temp = time(NULL);
+  struct tm *tick_time = localtime(&temp);
+
+  // Write the current hours and minutes into a buffer
+  static char s_buffer[8];
+  strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ?
+                                          "%H:%M" : "%I:%M", tick_time);
+
+  // Display this time on the TextLayer
+  text_layer_set_text(s_time_layer, s_buffer);
+}
+
+static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+update_time();
+  
+}
+
 static void sync_error_callback(DictionaryResult dict_error, AppMessageResult app_message_error, void *context) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "App Message Sync Error: %d", app_message_error);
 }
@@ -39,7 +67,7 @@ static void inbox_dropped_callback(AppMessageResult reason, void *context) {
 }
 
 static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tuple, const Tuple* old_tuple, void* context) {
-  APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi4");
+  APP_LOG(APP_LOG_LEVEL_DEBUG,"Hiiii");
   switch (key) {
    
     
@@ -79,6 +107,9 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
       text_layer_set_text(s_route_layer,test3);
                 
       break;
+    
+    
+    
     
   }
 }
@@ -132,6 +163,14 @@ static void window_load(Window *window) {
   text_layer_set_text_alignment(s_route_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_route_layer));
   
+  s_time_layer = text_layer_create(GRect(0, 10, bounds.size.w, 32));
+  text_layer_set_text_color(s_time_layer, GColorBlack);
+  text_layer_set_background_color(s_time_layer, GColorClear);
+  text_layer_set_font(s_time_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
+  text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
+  layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
+  
+  update_time();
   Tuplet initial_values[] = {
     TupletInteger(WEATHER_ICON_KEY, (uint8_t) 1),
     
@@ -140,6 +179,7 @@ static void window_load(Window *window) {
     TupletCString(WEATHER_ROUTE_KEY, "Loading Data")
     
   };
+  
 //APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi2");
   app_sync_init(&s_sync, s_sync_buffer, sizeof(s_sync_buffer),
       initial_values, ARRAY_LENGTH(initial_values),
@@ -153,7 +193,7 @@ static void window_unload(Window *window) {
   if (s_icon_bitmap) {
     gbitmap_destroy(s_icon_bitmap);
   }
-
+text_layer_destroy(s_time_layer);
   text_layer_destroy(s_route_layer);
   text_layer_destroy(s_city_layer);
   text_layer_destroy(s_temperature_layer);
@@ -162,6 +202,7 @@ static void window_unload(Window *window) {
 
 static void init(void) {
   s_main_window = window_create();
+  tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
   window_set_background_color(s_main_window, PBL_IF_COLOR_ELSE(GColorCeleste , GColorBlack));
   window_set_window_handlers(s_main_window, (WindowHandlers) {
     .load = window_load,
