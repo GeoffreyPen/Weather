@@ -17,6 +17,8 @@ static uint8_t s_sync_buffer[128];
 static char test2[50];
 static char test[50];
 static char test3[50];
+static char test4[50];
+static int eta=0;
 //static struct tm s_last_time;
 static struct tm s_time;
 char *asctime(const struct tm *clock);
@@ -42,7 +44,11 @@ static void update_time() {
   // Get a tm structure
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
-
+  if(eta>0){
+    eta=eta-1;
+    snprintf(test4,sizeof(test4),"ETA: %d MINS",eta);
+    text_layer_set_text(s_eta_layer,test4);
+  }
   // Write the current hours and minutes into a buffer
   static char s_buffer[8];
   strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ?
@@ -87,16 +93,27 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
       // App Sync keeps new_tuple in s_sync_buffer, so we may use it directly
       snprintf(test, sizeof(test),new_tuple->value->cstring);
       //snprintf(test, sizeof(test), "  %d Latitude", (int)new_tuple->value->int32);
+    
       text_layer_set_text(s_stop_layer,test);
       //text_layer_set_text(s_stop_layer, new_tuple->value->int32;
       break;
 
     case TRANSIT_ETA_KEY:
     APP_LOG(APP_LOG_LEVEL_DEBUG,"H11");
-      //text_layer_set_text(s_city_layer, new_tuple->value->int32;
-          snprintf(test2, sizeof(test2),new_tuple->value->cstring);
+    //eta=(int)(new_tuple->value->int32);
+    
+    //snprintf(test2, sizeof(test2),"%d",(int)(new_tuple->value->int32));
+      //text_layer_set_text(s_eta_layer, test2);
+          
+    snprintf(test2, sizeof(test2),new_tuple->value->cstring);
+      
+    //eta=1;
+    eta=atoi(test2);
+    snprintf(test2, sizeof(test2),"ETA: %d MINS",eta);
+    if(eta>-1)
+      {
       text_layer_set_text(s_eta_layer,test2);
-                
+    }
       break;
     
     case TRANSIT_ROUTE_KEY:
@@ -107,14 +124,11 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
       text_layer_set_text(s_route_layer,test3);
                 
       break;
-    
-    
-    
-    
   }
 }
 
 static void request_TRANSIT(void) {
+  eta=0;
   APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi7");
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
@@ -166,7 +180,7 @@ static void window_load(Window *window) {
   s_time_layer = text_layer_create(GRect(0, 10, bounds.size.w, 32));
   text_layer_set_text_color(s_time_layer, GColorBlack);
   text_layer_set_background_color(s_time_layer, GColorClear);
-  text_layer_set_font(s_time_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
+  text_layer_set_font(s_time_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
   text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
   
@@ -175,7 +189,7 @@ static void window_load(Window *window) {
     TupletInteger(TRANSIT_ICON_KEY, (uint8_t) 1),
     
     TupletCString(TRANSIT_STOP_KEY, "Retry After 30s"),
-    TupletCString(TRANSIT_ETA_KEY, ""),
+    TupletCString(TRANSIT_ETA_KEY, "-1"),
     TupletCString(TRANSIT_ROUTE_KEY, "Loading Data")
     
   };

@@ -53,7 +53,7 @@ function fetchTRANSIT(latitude, longitude) {
 //http://api.translink.ca/rttiapi/v1/stops/60980/estimates?apikey=M5uO4PdfDGgA0b7TIKjj&count=1
           
           'TRANSIT_STOP_KEY': "STOP: "+ stop,
-          'TRANSIT_ETA_KEY': "ETA: "+ time + " MINS",
+          'TRANSIT_ETA_KEY': time,
           'TRANSIT_ROUTE_KEY': "ROUTE: "+ route +" "+direction,
           //console.log(TRANSIT_ROUTE_KEY);
           //'TRANSIT_stop_KEY': latitude,
