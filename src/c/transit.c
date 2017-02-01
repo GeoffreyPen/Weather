@@ -4,8 +4,8 @@
 
 static Window *s_main_window;
 
-static TextLayer *s_temperature_layer;
-static TextLayer *s_city_layer;
+static TextLayer *s_stop_layer;
+static TextLayer *s_eta_layer;
 static TextLayer *s_route_layer;
 static TextLayer *s_time_layer;
 static BitmapLayer *s_icon_layer;
@@ -24,14 +24,14 @@ char *asctime(const struct tm *clock);
     //struct tm *time_now = localtime(&ttt);
 static char label[12];
 
-enum WeatherKey {
-  WEATHER_ICON_KEY = 0x0,         // TUPLE_INT
-  WEATHER_TEMPERATURE_KEY = 0x1,  // TUPLE_CSTRING
-  WEATHER_CITY_KEY = 0x2,         // TUPLE_CSTRING
-  WEATHER_ROUTE_KEY = 0x3        // TUPLE_CSTRING
+enum TRANSITKey {
+  TRANSIT_ICON_KEY = 0x0,         // TUPLE_INT
+  TRANSIT_STOP_KEY = 0x1,  // TUPLE_CSTRING
+  TRANSIT_ETA_KEY = 0x2,         // TUPLE_CSTRING
+  TRANSIT_ROUTE_KEY = 0x3        // TUPLE_CSTRING
 };
 
-static const uint32_t WEATHER_ICONS[] = {
+static const uint32_t TRANSIT_ICONS[] = {
   RESOURCE_ID_IMAGE_SUN, // 0
   RESOURCE_ID_IMAGE_CLOUD, // 1
   RESOURCE_ID_IMAGE_RAIN, // 2
@@ -71,35 +71,35 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
   switch (key) {
    
     
-    case WEATHER_ICON_KEY:
+    case TRANSIT_ICON_KEY:
     APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi10");
       if (s_icon_bitmap) {
         gbitmap_destroy(s_icon_bitmap);
       }
 
-      s_icon_bitmap = gbitmap_create_with_resource(WEATHER_ICONS[new_tuple->value->uint8]);
+      s_icon_bitmap = gbitmap_create_with_resource(TRANSIT_ICONS[new_tuple->value->uint8]);
       //bitmap_layer_set_compositing_mode(s_icon_layer, GCompOpSet);
       //bitmap_layer_set_bitmap(s_icon_layer, s_icon_bitmap);
       break;
     
-    case WEATHER_TEMPERATURE_KEY:
+    case TRANSIT_STOP_KEY:
     APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi9");
       // App Sync keeps new_tuple in s_sync_buffer, so we may use it directly
       snprintf(test, sizeof(test),new_tuple->value->cstring);
       //snprintf(test, sizeof(test), "  %d Latitude", (int)new_tuple->value->int32);
-      text_layer_set_text(s_temperature_layer,test);
-      //text_layer_set_text(s_temperature_layer, new_tuple->value->int32;
+      text_layer_set_text(s_stop_layer,test);
+      //text_layer_set_text(s_stop_layer, new_tuple->value->int32;
       break;
 
-    case WEATHER_CITY_KEY:
+    case TRANSIT_ETA_KEY:
     APP_LOG(APP_LOG_LEVEL_DEBUG,"H11");
       //text_layer_set_text(s_city_layer, new_tuple->value->int32;
           snprintf(test2, sizeof(test2),new_tuple->value->cstring);
-      text_layer_set_text(s_city_layer,test2);
+      text_layer_set_text(s_eta_layer,test2);
                 
       break;
     
-    case WEATHER_ROUTE_KEY:
+    case TRANSIT_ROUTE_KEY:
 
       //text_layer_set_text(s_city_layer, new_tuple->value->int32;
           snprintf(test3, sizeof(test3),new_tuple->value->cstring);
@@ -114,7 +114,7 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
   }
 }
 
-static void request_weather(void) {
+static void request_TRANSIT(void) {
   APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi7");
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
@@ -142,21 +142,21 @@ static void window_load(Window *window) {
 
 
   
-  s_temperature_layer = text_layer_create(GRect(0, 90, bounds.size.w, 32));
-  text_layer_set_text_color(s_temperature_layer, GColorBlack);
-  text_layer_set_background_color(s_temperature_layer, GColorClear);
-  text_layer_set_font(s_temperature_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
-  text_layer_set_text_alignment(s_temperature_layer, GTextAlignmentCenter);
-  layer_add_child(window_layer, text_layer_get_layer(s_temperature_layer));
+  s_stop_layer = text_layer_create(GRect(0, 90, bounds.size.w, 32));
+  text_layer_set_text_color(s_stop_layer, GColorBlack);
+  text_layer_set_background_color(s_stop_layer, GColorClear);
+  text_layer_set_font(s_stop_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
+  text_layer_set_text_alignment(s_stop_layer, GTextAlignmentCenter);
+  layer_add_child(window_layer, text_layer_get_layer(s_stop_layer));
 
-  s_city_layer = text_layer_create(GRect(0, 122, bounds.size.w, 32));
-  text_layer_set_text_color(s_city_layer, GColorBlack);
-  text_layer_set_background_color(s_city_layer, GColorClear);
-  text_layer_set_font(s_city_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
-  text_layer_set_text_alignment(s_city_layer, GTextAlignmentCenter);
-  layer_add_child(window_layer, text_layer_get_layer(s_city_layer));
+  s_eta_layer = text_layer_create(GRect(0, 122, bounds.size.w, 32));
+  text_layer_set_text_color(s_eta_layer, GColorBlack);
+  text_layer_set_background_color(s_eta_layer, GColorClear);
+  text_layer_set_font(s_eta_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
+  text_layer_set_text_alignment(s_eta_layer, GTextAlignmentCenter);
+  layer_add_child(window_layer, text_layer_get_layer(s_eta_layer));
 
-      s_route_layer = text_layer_create(GRect(0, 50, bounds.size.w, 32));
+  s_route_layer = text_layer_create(GRect(0, 50, bounds.size.w, 32));
   text_layer_set_text_color(s_route_layer, GColorBlack);
   text_layer_set_background_color(s_route_layer, GColorClear);
   text_layer_set_font(s_route_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
@@ -172,11 +172,11 @@ static void window_load(Window *window) {
   
   update_time();
   Tuplet initial_values[] = {
-    TupletInteger(WEATHER_ICON_KEY, (uint8_t) 1),
+    TupletInteger(TRANSIT_ICON_KEY, (uint8_t) 1),
     
-    TupletCString(WEATHER_TEMPERATURE_KEY, "Retry After 30s"),
-    TupletCString(WEATHER_CITY_KEY, ""),
-    TupletCString(WEATHER_ROUTE_KEY, "Loading Data")
+    TupletCString(TRANSIT_STOP_KEY, "Retry After 30s"),
+    TupletCString(TRANSIT_ETA_KEY, ""),
+    TupletCString(TRANSIT_ROUTE_KEY, "Loading Data")
     
   };
   
@@ -185,7 +185,7 @@ static void window_load(Window *window) {
       initial_values, ARRAY_LENGTH(initial_values),
       sync_tuple_changed_callback, sync_error_callback, NULL);
 
-  request_weather();
+  request_TRANSIT();
   //APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi3");
 }
 
@@ -195,8 +195,8 @@ static void window_unload(Window *window) {
   }
 text_layer_destroy(s_time_layer);
   text_layer_destroy(s_route_layer);
-  text_layer_destroy(s_city_layer);
-  text_layer_destroy(s_temperature_layer);
+  text_layer_destroy(s_eta_layer);
+  text_layer_destroy(s_stop_layer);
   bitmap_layer_destroy(s_icon_layer);
 }
 

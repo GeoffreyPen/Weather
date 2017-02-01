@@ -1,18 +1,18 @@
 var myAPIKey = '';
 
-function iconFromWeatherId(weatherId) {
-  if (weatherId < 600) {
+function iconFromTRANSITId(TRANSITId) {
+  if (TRANSITId < 600) {
     return 2;
-  } else if (weatherId < 700) {
+  } else if (TRANSITId < 700) {
     return 3;
-  } else if (weatherId > 800) {
+  } else if (TRANSITId > 800) {
     return 1;
   } else {
     return 0;
   }
 }
 
-function fetchWeather(latitude, longitude) {
+function fetchTRANSIT(latitude, longitude) {
   var req = new XMLHttpRequest();
   var req2 = new XMLHttpRequest();
   var stop="";
@@ -48,16 +48,16 @@ function fetchWeather(latitude, longitude) {
         console.log("Route"+route);
         //console.log('lat3= ' + latitude + ' lon3= ' + longitude);
         Pebble.sendAppMessage({
-          //'WEATHER_ICON_KEY': icon,
+          //'TRANSIT_ICON_KEY': icon,
           
 //http://api.translink.ca/rttiapi/v1/stops/60980/estimates?apikey=M5uO4PdfDGgA0b7TIKjj&count=1
           
-          'WEATHER_TEMPERATURE_KEY': "STOP: "+ stop,
-          'WEATHER_CITY_KEY': "ETA: "+ time + " MINS",
-          'WEATHER_ROUTE_KEY': "ROUTE: "+ route +" "+direction,
-          //console.log(WEATHER_ROUTE_KEY);
-          //'WEATHER_TEMPERATURE_KEY': latitude,
-          //'WEATHER_CITY_KEY': longitude
+          'TRANSIT_STOP_KEY': "STOP: "+ stop,
+          'TRANSIT_ETA_KEY': "ETA: "+ time + " MINS",
+          'TRANSIT_ROUTE_KEY': "ROUTE: "+ route +" "+direction,
+          //console.log(TRANSIT_ROUTE_KEY);
+          //'TRANSIT_stop_KEY': latitude,
+          //'TRANSIT_CITY_KEY': longitude
         });
       }
    }
@@ -69,10 +69,10 @@ function fetchWeather(latitude, longitude) {
   //http://api.translink.ca/rttiapi/v1/stops?apikey=M5uO4PdfDGgA0b7TIKjj&lat=49.248523&long=-123.108800&radius=500
     req.send(null);
    //     var response = JSON.parse(req.responseText);
-   //     var temperature = Math.round(response.main.temp - 273.15);
-   //     var icon = iconFromWeatherId(response.weather[0].id);
+   //     var stop = Math.round(response.main.temp - 273.15);
+   //     var icon = iconFromTRANSITId(response.TRANSIT[0].id);
    //     var city = response.name;
-    //    console.log(temperature);
+    //    console.log(stop);
     //    console.log(icon);
     //    console.log(city);
 
@@ -87,14 +87,14 @@ function fetchWeather(latitude, longitude) {
 function locationSuccess(pos) {
   var coordinates = pos.coords;
   console.log('lat= ' + pos.coords.latitude + ' lon= ' + pos.coords.longitude);
-  fetchWeather(coordinates.latitude, coordinates.longitude);
+  fetchTRANSIT(coordinates.latitude, coordinates.longitude);
 }
 
 function locationError(err) {
   console.warn('location error (' + err.code + '): ' + err.message);
   Pebble.sendAppMessage({
-    'WEATHER_CITY_KEY': 'Loc Unavailable',
-    'WEATHER_TEMPERATURE_KEY': 'N/A'
+    'TRANSIT_ETA_KEY': 'Loc Unavailable',
+    'TRANSIT_STOP_KEY': 'N/A'
   });
 }
 
@@ -114,7 +114,7 @@ Pebble.addEventListener('appmessage', function (e) {
   window.navigator.geolocation.getCurrentPosition(locationSuccess, locationError,
     locationOptions);
   console.log(e.type);
-  console.log(e.payload.temperature);
+  console.log(e.payload.stop);
   console.log('message!');
 });
 

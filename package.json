@@ -10,10 +10,10 @@
         "displayName": "PebbleJS Weather",
         "enableMultiJS": false,
         "messageKeys": {
-            "WEATHER_CITY_KEY": 2,
-            "WEATHER_ICON_KEY": 0,
-            "WEATHER_ROUTE_KEY": 3,
-            "WEATHER_TEMPERATURE_KEY": 1
+            "TRANSIT_ETA_KEY": 2,
+            "TRANSIT_ICON_KEY": 0,
+            "TRANSIT_ROUTE_KEY": 3,
+            "TRANSIT_STOP_KEY": 1
         },
         "projectType": "native",
         "resources": {
