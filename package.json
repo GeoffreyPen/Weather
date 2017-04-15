@@ -2,18 +2,28 @@
     "author": "Pebble Technology",
     "dependencies": {},
     "keywords": [],
-    "name": "pebblejs-weather",
+    "name": "gtransit",
     "pebble": {
         "capabilities": [
             "location"
         ],
-        "displayName": "PebbleJS Weather",
+        "displayName": "GTransit",
         "enableMultiJS": false,
         "messageKeys": {
-            "TRANSIT_ETA_KEY": 2,
+            "DIR_KEY": 13,
+            "E_ETA_KEY": 2,
+            "E_ROUTE_KEY": 3,
+            "E_STOP_KEY": 1,
+            "N_ETA_KEY": 11,
+            "N_ROUTE_KEY": 12,
+            "N_STOP_KEY": 10,
+            "S_ETA_KEY": 8,
+            "S_ROUTE_KEY": 9,
+            "S_STOP_KEY": 7,
             "TRANSIT_ICON_KEY": 0,
-            "TRANSIT_ROUTE_KEY": 3,
-            "TRANSIT_STOP_KEY": 1
+            "W_ETA_KEY": 5,
+            "W_ROUTE_KEY": 6,
+            "W_STOP_KEY": 4
         },
         "projectType": "native",
         "resources": {

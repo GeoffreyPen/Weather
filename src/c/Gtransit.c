@@ -19,7 +19,23 @@ static char test2[50];
 static char test[50];
 static char test3[50];
 static char test4[50];
+
+static char dft[50];
+static char Nrte[50];
+static char Srte[50];
+static char Wrte[50];
+static char Erte[50];
+static char Wstop[50];
+static char Sstop[50];
+static char Estop[50];
+static char Nstop[50];
+static char Weta[50];
+static char Seta[50];
+static char Neta[50];
+static char Eeta[50];
+
 static int eta=0;
+static int dftdir=0;
 //static struct tm s_last_time;
 static struct tm s_time;
 char *asctime(const struct tm *clock);
@@ -29,9 +45,23 @@ static char label[12];
 
 enum TRANSITKey {
   TRANSIT_ICON_KEY = 0x0,         // TUPLE_INT
-  TRANSIT_STOP_KEY = 0x1,  // TUPLE_CSTRING
-  TRANSIT_ETA_KEY = 0x2,         // TUPLE_CSTRING
-  TRANSIT_ROUTE_KEY = 0x3        // TUPLE_CSTRING
+  E_STOP_KEY = 0x1,  // TUPLE_CSTRING
+  E_ETA_KEY = 0x2,         // TUPLE_CSTRING
+  E_ROUTE_KEY = 0x3,        // TUPLE_CSTRING
+
+  W_STOP_KEY = 0x4,  // TUPLE_CSTRING
+  W_ETA_KEY = 0x5,         // TUPLE_CSTRING
+  W_ROUTE_KEY = 0x6,        // TUPLE_CSTRING
+    
+  S_STOP_KEY = 0x7,  // TUPLE_CSTRING
+  S_ETA_KEY = 0x8,         // TUPLE_CSTRING
+  S_ROUTE_KEY = 0x9,        // TUPLE_CSTRING
+    
+  N_STOP_KEY = 0x10,  // TUPLE_CSTRING
+  N_ETA_KEY = 0x11,         // TUPLE_CSTRING
+  N_ROUTE_KEY = 0x12,        // TUPLE_CSTRING
+    
+  DIR_KEY = 0x13        // TUPLE_CSTRING
 };
 
 static const uint32_t TRANSIT_ICONS[] = {
@@ -77,56 +107,115 @@ static void inbox_dropped_callback(AppMessageResult reason, void *context) {
 static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tuple, const Tuple* old_tuple, void* context) {
   APP_LOG(APP_LOG_LEVEL_DEBUG,"Hiiii");
   switch (key) {
-   
+    case DIR_KEY:
+    snprintf(test2, sizeof(test2),new_tuple->value->cstring);
+    dftdir=atoi(test2);
+    dft=test2;
+    APP_LOG(APP_LOG_LEVEL_DEBUG,"%i",dftdir);
+    break;
     
     case TRANSIT_ICON_KEY:
     APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi10");
       if (s_icon_bitmap) {
         gbitmap_destroy(s_icon_bitmap);
       }
-
       s_icon_bitmap = gbitmap_create_with_resource(TRANSIT_ICONS[new_tuple->value->uint8]);
-      //bitmap_layer_set_compositing_mode(s_icon_layer, GCompOpSet);
-      //bitmap_layer_set_bitmap(s_icon_layer, s_icon_bitmap);
       break;
     
-    case TRANSIT_STOP_KEY:
-    APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi9");
-      // App Sync keeps new_tuple in s_sync_buffer, so we may use it directly
-      snprintf(test, sizeof(test),new_tuple->value->cstring);
-      //snprintf(test, sizeof(test), "  %d Latitude", (int)new_tuple->value->int32);
-    
+    case S_STOP_KEY:
+      APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi9");
+      snprintf(test, sizeof(test),new_tuple->value->cstring);   
       text_layer_set_text(s_stop_layer,test);
-      //text_layer_set_text(s_stop_layer, new_tuple->value->int32;
       break;
 
-    case TRANSIT_ETA_KEY:
-    APP_LOG(APP_LOG_LEVEL_DEBUG,"H11");
-    //eta=(int)(new_tuple->value->int32);
-    
-    //snprintf(test2, sizeof(test2),"%d",(int)(new_tuple->value->int32));
-      //text_layer_set_text(s_eta_layer, test2);
-          
-    snprintf(test2, sizeof(test2),new_tuple->value->cstring);
-      
-    //eta=1;
-    eta=atoi(test2);
-    snprintf(test2, sizeof(test2),"ETA: %d MINS",eta);
-    if(eta>-1)
+    case S_ETA_KEY:
+      APP_LOG(APP_LOG_LEVEL_DEBUG,"H11");
+      snprintf(test2, sizeof(test2),new_tuple->value->cstring);
+      eta=atoi(test2);
+      snprintf(test2, sizeof(test2),"ETA: %d MINS",eta);
+      if(eta>-1)
       {
-      text_layer_set_text(s_eta_layer,test2);
-    }
-      break;
+        text_layer_set_text(s_eta_layer,test2);
+      }
+    break;
     
-    case TRANSIT_ROUTE_KEY:
-
-      //text_layer_set_text(s_city_layer, new_tuple->value->int32;
-          snprintf(test3, sizeof(test3),new_tuple->value->cstring);
+    case S_ROUTE_KEY:
+      snprintf(test3, sizeof(test3),new_tuple->value->cstring);
       APP_LOG(APP_LOG_LEVEL_DEBUG,test3);
-      text_layer_set_text(s_route_layer,test3);
-                
+      text_layer_set_text(s_route_layer,test3);       
+    break;
+    
+        case N_STOP_KEY:
+      APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi9");
+      snprintf(test, sizeof(test),new_tuple->value->cstring);   
+      text_layer_set_text(s_stop_layer,test);
       break;
+
+    case N_ETA_KEY:
+      APP_LOG(APP_LOG_LEVEL_DEBUG,"H11");
+      snprintf(test2, sizeof(test2),new_tuple->value->cstring);
+      eta=atoi(test2);
+      snprintf(test2, sizeof(test2),"ETA: %d MINS",eta);
+      if(eta>-1)
+      {
+        text_layer_set_text(s_eta_layer,test2);
+      }
+    break;
+    
+    case N_ROUTE_KEY:
+      snprintf(test3, sizeof(test3),new_tuple->value->cstring);
+      APP_LOG(APP_LOG_LEVEL_DEBUG,test3);
+      text_layer_set_text(s_route_layer,test3);       
+    break;
+    
+    case W_STOP_KEY:
+      APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi9");
+      snprintf(test, sizeof(test),new_tuple->value->cstring);   
+      text_layer_set_text(s_stop_layer,test);
+    break;
+
+    case W_ETA_KEY:
+      APP_LOG(APP_LOG_LEVEL_DEBUG,"H11");
+      snprintf(test2, sizeof(test2),new_tuple->value->cstring);
+      eta=atoi(test2);
+      snprintf(test2, sizeof(test2),"ETA: %d MINS",eta);
+      if(eta>-1)
+      {
+        text_layer_set_text(s_eta_layer,test2);
+      }
+    break;
+    
+    case W_ROUTE_KEY:
+      snprintf(test3, sizeof(test3),new_tuple->value->cstring);
+      APP_LOG(APP_LOG_LEVEL_DEBUG,test3);
+      text_layer_set_text(s_route_layer,test3);       
+    break;
+    
+    case E_STOP_KEY:
+      APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi9");
+      snprintf(test, sizeof(test),new_tuple->value->cstring);   
+      text_layer_set_text(s_stop_layer,test);
+    break;
+
+    case E_ETA_KEY:
+      APP_LOG(APP_LOG_LEVEL_DEBUG,"H11");
+      snprintf(test2, sizeof(test2),new_tuple->value->cstring);
+      eta=atoi(test2);
+      snprintf(test2, sizeof(test2),"ETA: %d MINS",eta);
+      if(eta>-1)
+      {
+        text_layer_set_text(s_eta_layer,test2);
+      }
+    break;
+    
+    case E_ROUTE_KEY:
+      snprintf(test3, sizeof(test3),new_tuple->value->cstring);
+      APP_LOG(APP_LOG_LEVEL_DEBUG,test3);
+      text_layer_set_text(s_route_layer,test3);       
+    break;
   }
+
+
 }
 
 static void request_TRANSIT(void) {
@@ -218,9 +307,9 @@ static void window_load(Window *window) {
   Tuplet initial_values[] = {
     TupletInteger(TRANSIT_ICON_KEY, (uint8_t) 1),
     
-    TupletCString(TRANSIT_STOP_KEY, "Retry After 30s"),
-    TupletCString(TRANSIT_ETA_KEY, "-1"),
-    TupletCString(TRANSIT_ROUTE_KEY, "Loading Data")
+    TupletCString(S_STOP_KEY, "Retry After 30s"),
+    TupletCString(S_ETA_KEY, "-1"),
+    TupletCString(S_ROUTE_KEY, "Loading Data")
     
   };
   
