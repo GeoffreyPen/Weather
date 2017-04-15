@@ -9,6 +9,7 @@ static TextLayer *s_eta_layer;
 static TextLayer *s_route_layer;
 static TextLayer *s_time_layer;
 static BitmapLayer *s_icon_layer;
+static Layer *s_ui_layer;
 
 static GBitmap *s_icon_bitmap = NULL;
 
@@ -39,6 +40,7 @@ static const uint32_t TRANSIT_ICONS[] = {
   RESOURCE_ID_IMAGE_RAIN, // 2
   RESOURCE_ID_IMAGE_SNOW // 3
 };
+
 
 static void update_time() {
   // Get a tm structure
@@ -146,6 +148,26 @@ static void request_TRANSIT(void) {
   APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi8");
 }
 
+void down_single_click_handler(ClickRecognizerRef recognizer, void *context) {
+   APP_LOG(APP_LOG_LEVEL_DEBUG,"Mach7");
+  Window *window = (Window *)context;
+}
+
+void up_single_click_handler(ClickRecognizerRef recognizer, void *context) {
+   APP_LOG(APP_LOG_LEVEL_DEBUG,"Mach8");
+  Window *window = (Window *)context;
+}
+
+void click_config_provider(void *context) {
+  window_single_click_subscribe(BUTTON_ID_DOWN, down_single_click_handler);
+  window_single_click_subscribe(BUTTON_ID_UP, up_single_click_handler);
+}
+
+
+
+//static ActionBarLayer *s_action_bar_layer;
+//static GBitmap *s_tick_bitmap, *s_cross_bitmap;
+
 static void window_load(Window *window) {
      APP_LOG(APP_LOG_LEVEL_DEBUG,"Hi1");
   Layer *window_layer = window_get_root_layer(window);
@@ -153,7 +175,15 @@ static void window_load(Window *window) {
 
   s_icon_layer = bitmap_layer_create(GRect(0, 10, bounds.size.w, 80));
   layer_add_child(window_layer, bitmap_layer_get_layer(s_icon_layer));
+  window_set_click_config_provider(window, click_config_provider);
+  //s_tick_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_SUN);
+  //s_cross_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_CLOUD);
 
+  //s_action_bar_layer = action_bar_layer_create();
+  //action_bar_layer_set_icon(s_action_bar_layer, BUTTON_ID_UP, s_tick_bitmap);
+  //action_bar_layer_set_icon(s_action_bar_layer, BUTTON_ID_DOWN, s_cross_bitmap);
+  //action_bar_layer_add_to_window(s_action_bar_layer, window);
+  //action_bar_layer_set_click_config_provider(s_action_bar_layer,click_config_provider);
 
   
   s_stop_layer = text_layer_create(GRect(0, 90, bounds.size.w, 32));
@@ -212,6 +242,13 @@ text_layer_destroy(s_time_layer);
   text_layer_destroy(s_eta_layer);
   text_layer_destroy(s_stop_layer);
   bitmap_layer_destroy(s_icon_layer);
+  //action_bar_layer_destroy(s_action_bar_layer);
+  
+    //gbitmap_destroy(s_tick_bitmap);
+  //gbitmap_destroy(s_cross_bitmap);
+  
+    window_destroy(window);
+  s_main_window = NULL;
 }
 
 static void init(void) {
@@ -223,7 +260,7 @@ static void init(void) {
     .unload = window_unload
   });
   window_stack_push(s_main_window, true);
-
+//window_set_click_config_provider(s_main_window, (ClickConfigProvider) window_single_click_subscribe(BUTTON_ID_UP,));
   app_message_open(128, 128);
 }
 
