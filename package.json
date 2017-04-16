@@ -14,6 +14,7 @@
             "E_ETA_KEY": 2,
             "E_ROUTE_KEY": 3,
             "E_STOP_KEY": 1,
+            "MESSAGE_KEY_RequestData": 14,
             "N_ETA_KEY": 11,
             "N_ROUTE_KEY": 12,
             "N_STOP_KEY": 10,
