@@ -47,7 +47,10 @@ function fetchTRANSIT(latitude, longitude) {
   var lat=(''+latitude).substring(0,(""+latitude).indexOf(".")+7);
   var long=(''+longitude).substring(0,(""+longitude).indexOf(".")+7);
   console.log('lati= ' + lat + ' long= ' + long);
-  req.open('GET', 'http://api.translink.ca/rttiapi/v1/stops?apikey=M5uO4PdfDGgA0b7TIKjj&lat=' + lat + '&long=' + long + '&radius=100',true);
+  lat= 49.273114;
+  long = -123.100348;
+   
+  req.open('GET', 'http://api.translink.ca/rttiapi/v1/stops?apikey=M5uO4PdfDGgA0b7TIKjj&lat=' + lat + '&long=' + long + '&radius=500',true);
  // req.open('GET', 'http://api.translink.ca/rttiapi/v1/stops?apikey=M5uO4PdfDGgA0b7TIKjj&lat=49.248523&long=-123.108800&radius=10',true);
   
   
@@ -75,7 +78,8 @@ function fetchTRANSIT(latitude, longitude) {
   W=3
   E=4
   */
-        console.log("Direction2:" +JSON.stringify(user_dir==="2"));
+        console.log("Direction2:" +JSON.stringify(testint));
+        testint=testint+1;
    /////////////EAST    
         if(Estop!=="" && ((user_dir===0 && default_dir==="EB") || user_dir==="4"))
           {
@@ -162,7 +166,7 @@ function fetchTRANSIT(latitude, longitude) {
                 if(Nstop!=="" && ((user_dir===0 && default_dir==="NB") ||user_dir==="2"))
           {
             console.log('Nstop'+Nstop+"4");
-          req5.open('GET', 'http://api.translink.ca/rttiapi/v1/stops/'+Nstop+'/estimates?apikey=M5uO4PdfDGgA0b7TIKjj&count=1',true);
+            req5.open('GET', 'http://api.translink.ca/rttiapi/v1/stops/'+Nstop+'/estimates?apikey=M5uO4PdfDGgA0b7TIKjj&count=1',true);
         req5.onload = function () {
         if (req5.readyState === 4) {
       if (req5.status === 200) {
@@ -225,7 +229,7 @@ Pebble.addEventListener('ready', function (e) {
 Pebble.addEventListener('appmessage', function (e) {
     var dict = e.payload;
   user_dir=JSON.stringify(dict).substring(JSON.stringify(dict).indexOf("{")+6,JSON.stringify(dict).indexOf("}"));
-  testint=dict+"";
+  //testint=dict+"";
   console.log('Got message: ' + JSON.stringify(dict));
   //user_dir=dict;
   console.log(String(user_dir));

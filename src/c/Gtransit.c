@@ -110,7 +110,25 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
      APP_LOG(APP_LOG_LEVEL_DEBUG,"whasdfadsfaSDF");
     snprintf(dft, sizeof(dft),new_tuple->value->cstring);
     //dftdir=atoi(test2);
-    
+      /*S=1
+  N=2
+  W=3
+  E=4
+  */
+    switch(dft[0]){
+      case 'S':
+      userdir=1;
+      break;
+      case 'W':
+      userdir=3;
+      break;
+        case 'N':
+      userdir=2;
+      break;
+        case 'E':
+      userdir=4;
+        break;
+    }
     APP_LOG(APP_LOG_LEVEL_DEBUG,dft);
     break;
     
@@ -274,8 +292,14 @@ void down_single_click_handler(ClickRecognizerRef recognizer, void *context) {
   W=3
   E=4
   */
-  userdir=1;
+    if(userdir==3){
+    userdir=4;
+  }
+  else{
+    userdir=3;
+  };
   change_direction();
+  
   }
 
 void up_single_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -286,7 +310,13 @@ void up_single_click_handler(ClickRecognizerRef recognizer, void *context) {
   W=3
   E=4
   */
-  userdir=2;
+  if(userdir==1){
+    userdir=2;
+  }
+  else{
+    userdir=1;
+  };
+  
   change_direction();
 }
 
