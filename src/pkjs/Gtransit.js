@@ -2,6 +2,7 @@ var myAPIKey = '';
 var user_dir="0";
   var testint=0;
 var routechoice=0;
+var current=0;
 
 function BusInfo (route,stop,eta) {
     this.route = route;
@@ -12,68 +13,14 @@ function BusInfo (route,stop,eta) {
 var West=[];
 
 
-var East = {
-    route: "",
-  stop: "",
-  eta:"",
-  
-    getroute: function () {
-        return this.route;
-    },
-      getstop: function () {
-        return this.stop;
-    },
-    geteta: function () {
-        return this.eta;
-    }
-};
+var East = [];
 
-var West2 = {
-    route: "",
-  stop: "",
-  eta:"",
-  
-    getroute: function () {
-        return this.route;
-    },
-      getstop: function () {
-        return this.stop;
-    },
-    geteta: function () {
-        return this.eta;
-    }
-}
 
-var North = {
-    route: "",
-  stop: "",
-  eta:"",
-  
-    getroute: function () {
-        return this.route;
-    },
-      getstop: function () {
-        return this.stop;
-    },
-    geteta: function () {
-        return this.eta;
-    }
-}
+var North = [];
 
-var South = {
-    route: "",
-  stop: "",
-  eta:"",
-    getroute: function () {
-        return this.route;
-    },
-      getstop: function () {
-        return this.stop;
-    },
-    geteta: function () {
-        return this.eta;
-    }
-}
+
+var South = [];
+
 
 function iconFromTRANSITId(TRANSITId) {
   if (TRANSITId < 600) {
@@ -184,11 +131,13 @@ function fetchTRANSIT(latitude, longitude) {
           console.log(req2.responseText);
         console.log("Route"+Eroute);
         //console.log('lat3= ' + latitude + ' lon3= ' + longitude);
-        Pebble.sendAppMessage({
-        'DIR_KEY': default_dir,
-          'S_STOP_KEY': "STOP: "+ Estop,
-          'S_ETA_KEY': Etime,
-          'S_ROUTE_KEY': "ROUTE: "+ Eroute +" "+Edirection,
+        East.push(new BusInfo("ROUTE: "+ Eroute +" "+Edirection,"STOP: "+ Estop,Etime));
+        
+                Pebble.sendAppMessage({
+          'DIR_KEY': default_dir,
+          'S_STOP_KEY': East[0].stop,
+          'S_ETA_KEY': East[0].eta,
+          'S_ROUTE_KEY': East[0].route,
         });
       }
    }
@@ -216,9 +165,9 @@ function fetchTRANSIT(latitude, longitude) {
         
                 Pebble.sendAppMessage({
           'DIR_KEY': default_dir,
-          'S_STOP_KEY': "STOP: "+ Wstop,
-          'S_ETA_KEY': Wtime,
-          'S_ROUTE_KEY': "ROUTE: "+ Wroute +" "+Wdirection,
+          'S_STOP_KEY': West[0].stop,
+          'S_ETA_KEY': West[0].eta,
+          'S_ROUTE_KEY': West[0].route,
         });
 
       }
@@ -234,19 +183,30 @@ function fetchTRANSIT(latitude, longitude) {
         req4.onload = function () {
         if (req4.readyState === 4) {
       if (req4.status === 200) {
-          //<ExpectedCountdown>2</ExpectedCountdown>
-        Stime=(req4.responseText).substring((req4.responseText).indexOf("<ExpectedCountdown>")+19,(req4.responseText).indexOf("</ExpectedCountdown>"));
-        Sroute=(req4.responseText).substring((req4.responseText).indexOf("<RouteNo>")+9,(req4.responseText).indexOf("</RouteNo>"));
-        Sdirection=(req4.responseText).substring((req4.responseText).indexOf("<Direction>")+11,(req4.responseText).indexOf("<Direction>")+12);
-        //<RouteNo>003<Direction></Direction>
-          console.log(req4.responseText);
-        console.log("Route"+Sroute);
-        //console.log('lat3= ' + latitude + ' lon3= ' + longitude);
-        Pebble.sendAppMessage({
-        'DIR_KEY': default_dir,
-          'S_STOP_KEY': "STOP: "+ Sstop,
-          'S_ETA_KEY': Stime,
-          'S_ROUTE_KEY': "ROUTE: "+ Sroute +" "+Sdirection,
+          
+        var Stemp=req4.responseText;
+        var check=0;
+        while ((Stemp.indexOf("<Direction>")>0)&&check<10)
+          {
+            check=check+1;
+            Stime=Stemp.substring(Stemp.indexOf("<ExpectedCountdown>")+19,Stemp.indexOf("</ExpectedCountdown>"));
+            Sroute=Stemp.substring(Stemp.indexOf("<RouteNo>")+9,Stemp.indexOf("</RouteNo>"));
+            Sdirection=Stemp.substring(Stemp.indexOf("<Direction>")+11,Stemp.indexOf("<Direction>")+12);
+            Stemp=Stemp.substring(Stemp.indexOf("<Direction>")+13,Stemp.length-1);
+            South.push(new BusInfo("ROUTE: "+ Sroute +" "+Sdirection,"STOP: "+ Sstop,Stime));
+          }
+        //Stime=(req4.responseText).substring((req4.responseText).indexOf("<ExpectedCountdown>")+19,(req4.responseText).indexOf("</ExpectedCountdown>"));
+        //Sroute=(req4.responseText).substring((req4.responseText).indexOf("<RouteNo>")+9,(req4.responseText).indexOf("</RouteNo>"));
+        //Sdirection=(req4.responseText).substring((req4.responseText).indexOf("<Direction>")+11,(req4.responseText).indexOf("<Direction>")+12);
+       
+
+        
+        
+          Pebble.sendAppMessage({
+          'DIR_KEY': default_dir,
+          'S_STOP_KEY': South[0].stop,
+          'S_ETA_KEY': South[0].eta,
+          'S_ROUTE_KEY': South[0].route,
         });
       }
    }
@@ -269,11 +229,13 @@ function fetchTRANSIT(latitude, longitude) {
           console.log(req5.responseText);
         console.log("Route"+Nroute);
         //console.log('lat3= ' + latitude + ' lon3= ' + longitude);
-        Pebble.sendAppMessage({
-        'DIR_KEY': default_dir,
-          'S_STOP_KEY': "STOP: "+ Nstop,
-          'S_ETA_KEY': Ntime,
-          'S_ROUTE_KEY': "ROUTE: "+ Nroute +" "+Ndirection,
+        North.push(new BusInfo("ROUTE: "+ Nroute +" "+Ndirection,"STOP: "+ Nstop,Ntime));
+        
+                Pebble.sendAppMessage({
+          'DIR_KEY': default_dir,
+          'S_STOP_KEY': North[0].stop,
+          'S_ETA_KEY': North[0].eta,
+          'S_ROUTE_KEY': North[0].route,
         });
       }
    }
@@ -286,9 +248,14 @@ function fetchTRANSIT(latitude, longitude) {
 }
   };
     req.send(null);
+}
 
-  
-  
+function update(stop,eta,route){
+  Pebble.sendAppMessage({
+          'S_STOP_KEY': stop,
+          'S_ETA_KEY': eta,
+          'S_ROUTE_KEY': route,
+            });
 }
 
 function locationSuccess(pos) {
@@ -322,12 +289,18 @@ Pebble.addEventListener('appmessage', function (e) {
   var temp=JSON.stringify(dict).substring(JSON.stringify(dict).indexOf("{")+6,JSON.stringify(dict).indexOf("}"));
   if(temp!=='9')
     {
+      current=0;
       user_dir=temp;
       window.navigator.geolocation.getCurrentPosition(locationSuccess, locationError,
     locationOptions);
     }
   else{
       console.log('MIDDLE BUTTON!');
+    current=current+1;
+    if(current>=South.length){
+      current=0;
+    }
+    update(South[current].stop,South[current].eta,South[current].route);
   }
 
   //testint=dict+"";
