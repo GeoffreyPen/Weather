@@ -1,6 +1,79 @@
 var myAPIKey = '';
-var user_dir=0;
-  var testint="0";
+var user_dir="0";
+  var testint=0;
+var routechoice=0;
+
+function BusInfo (route,stop,eta) {
+    this.route = route;
+    this.stop =stop;
+    this.eta = eta;
+}
+
+var West=[];
+
+
+var East = {
+    route: "",
+  stop: "",
+  eta:"",
+  
+    getroute: function () {
+        return this.route;
+    },
+      getstop: function () {
+        return this.stop;
+    },
+    geteta: function () {
+        return this.eta;
+    }
+};
+
+var West2 = {
+    route: "",
+  stop: "",
+  eta:"",
+  
+    getroute: function () {
+        return this.route;
+    },
+      getstop: function () {
+        return this.stop;
+    },
+    geteta: function () {
+        return this.eta;
+    }
+}
+
+var North = {
+    route: "",
+  stop: "",
+  eta:"",
+  
+    getroute: function () {
+        return this.route;
+    },
+      getstop: function () {
+        return this.stop;
+    },
+    geteta: function () {
+        return this.eta;
+    }
+}
+
+var South = {
+    route: "",
+  stop: "",
+  eta:"",
+    getroute: function () {
+        return this.route;
+    },
+      getstop: function () {
+        return this.stop;
+    },
+    geteta: function () {
+        return this.eta;
+    }
+}
 
 function iconFromTRANSITId(TRANSITId) {
   if (TRANSITId < 600) {
@@ -53,15 +126,30 @@ function fetchTRANSIT(latitude, longitude) {
   req.open('GET', 'http://api.translink.ca/rttiapi/v1/stops?apikey=M5uO4PdfDGgA0b7TIKjj&lat=' + lat + '&long=' + long + '&radius=500',true);
  // req.open('GET', 'http://api.translink.ca/rttiapi/v1/stops?apikey=M5uO4PdfDGgA0b7TIKjj&lat=49.248523&long=-123.108800&radius=10',true);
   
-  
+  function matchRuleShort(str, rule) {
+  return new RegExp("^" + rule.split("*").join(".*") + "$").test(str);
+}
   
   req.onload = function () {
     if (req.readyState === 4) {
       if (req.status === 200) {
         
       console.log(req.responseText);
-        default_dir=(req.responseText).substring((req.responseText).indexOf("<Name>")+6,(req.responseText).indexOf("<Name>")+8);
+        var count=0;
+        var temp2="";
+        //temp2=(req.responseText).substring((req.responseText).indexOf("<Name>")+6,(req.responseText).indexOf("<Name>")+8);
+        temp2=req.responseText;
+        console.log('Temp2'+temp2);
+        //Maybe this should work for skytrains................
+        while ((default_dir!=="EB"&&default_dir!=="WB"&&default_dir!=="SB"&&default_dir!=="NB")&&count<10) {
+          
+        default_dir=temp2.substring(temp2.indexOf("<Name>")+6,temp2.indexOf("<Name>")+8);
+        temp2=temp2.substring(temp2.indexOf("<Name>")+8,temp2.length-1);
+        count=count+1;
+          console.log('Temp2'+temp2);
         console.log('Default'+default_dir);
+        }
+        
 
         
           //Estop=(req.responseText).substring((req.responseText).indexOf("<StopNo>")+8,(req.responseText).indexOf("<StopNo>")+13);
@@ -78,10 +166,10 @@ function fetchTRANSIT(latitude, longitude) {
   W=3
   E=4
   */
-        console.log("Direction2:" +JSON.stringify(testint));
+        console.log("Direction2:" +user_dir);
         testint=testint+1;
    /////////////EAST    
-        if(Estop!=="" && ((user_dir===0 && default_dir==="EB") || user_dir==="4"))
+        if(Estop!=="" && ((user_dir==="0" && default_dir==="EB") || user_dir==="4"))
           {
             console.log('Estop'+Estop+"1");
         req2.open('GET', 'http://api.translink.ca/rttiapi/v1/stops/'+Estop+'/estimates?apikey=M5uO4PdfDGgA0b7TIKjj&count=1',true);
@@ -108,7 +196,7 @@ function fetchTRANSIT(latitude, longitude) {
         req2.send(null);
           }
   /////////////////WEST      
-                if(Wstop!=="" && ((user_dir===0 && default_dir==="WB") ||user_dir==="3"))
+                if(Wstop!=="" && ((user_dir==="0" && default_dir==="WB") ||user_dir==="3"))
           {
         console.log('Wstop'+Wstop+"2");
            req3.open('GET', 'http://api.translink.ca/rttiapi/v1/stops/'+Wstop+'/estimates?apikey=M5uO4PdfDGgA0b7TIKjj&count=1',true);
@@ -123,8 +211,11 @@ function fetchTRANSIT(latitude, longitude) {
           console.log(req3.responseText);
         console.log("Route"+Wroute);
         //console.log('lat3= ' + latitude + ' lon3= ' + longitude);
+        
+        West.push(new BusInfo("ROUTE: "+ Wroute +" "+Wdirection,"STOP: "+ Wstop,Wtime));
+        
                 Pebble.sendAppMessage({
-        'DIR_KEY': default_dir,
+          'DIR_KEY': default_dir,
           'S_STOP_KEY': "STOP: "+ Wstop,
           'S_ETA_KEY': Wtime,
           'S_ROUTE_KEY': "ROUTE: "+ Wroute +" "+Wdirection,
@@ -136,7 +227,7 @@ function fetchTRANSIT(latitude, longitude) {
         req3.send(null);     
           };
   ////////////////SOUTH
-                if(Sstop!=="" && ((user_dir===0 && default_dir==="SB") || user_dir==="1"))
+                if(Sstop!=="" && ((user_dir==="0" && default_dir==="SB") || user_dir==="1"))
           {
             console.log('Sstop'+Sstop+"3");
                 req4.open('GET', 'http://api.translink.ca/rttiapi/v1/stops/'+Sstop+'/estimates?apikey=M5uO4PdfDGgA0b7TIKjj&count=1',true);
@@ -163,7 +254,7 @@ function fetchTRANSIT(latitude, longitude) {
         req4.send(null);
           };
   //////////////////NORTH
-                if(Nstop!=="" && ((user_dir===0 && default_dir==="NB") ||user_dir==="2"))
+                if(Nstop!=="" && ((user_dir==="0" && default_dir==="NB") ||user_dir==="2"))
           {
             console.log('Nstop'+Nstop+"4");
             req5.open('GET', 'http://api.translink.ca/rttiapi/v1/stops/'+Nstop+'/estimates?apikey=M5uO4PdfDGgA0b7TIKjj&count=1',true);
@@ -228,7 +319,17 @@ Pebble.addEventListener('ready', function (e) {
 
 Pebble.addEventListener('appmessage', function (e) {
     var dict = e.payload;
-  user_dir=JSON.stringify(dict).substring(JSON.stringify(dict).indexOf("{")+6,JSON.stringify(dict).indexOf("}"));
+  var temp=JSON.stringify(dict).substring(JSON.stringify(dict).indexOf("{")+6,JSON.stringify(dict).indexOf("}"));
+  if(temp!=='9')
+    {
+      user_dir=temp;
+      window.navigator.geolocation.getCurrentPosition(locationSuccess, locationError,
+    locationOptions);
+    }
+  else{
+      console.log('MIDDLE BUTTON!');
+  }
+
   //testint=dict+"";
   console.log('Got message: ' + JSON.stringify(dict));
   //user_dir=dict;
@@ -243,8 +344,7 @@ Pebble.addEventListener('appmessage', function (e) {
   E=4
   */
 
-  window.navigator.geolocation.getCurrentPosition(locationSuccess, locationError,
-    locationOptions);
+
 
 });
 

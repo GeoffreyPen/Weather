@@ -38,6 +38,7 @@ static char Eeta[50];
 
 static int eta=0;
 static int dftdir=0;
+static int rtechoice=0;
 //static struct tm s_last_time;
 static struct tm s_time;
 char *asctime(const struct tm *clock);
@@ -310,19 +311,42 @@ void up_single_click_handler(ClickRecognizerRef recognizer, void *context) {
   W=3
   E=4
   */
-  if(userdir==1){
-    userdir=2;
+  if(userdir==2){
+    userdir=1;
   }
   else{
-    userdir=1;
+    userdir=2;
   };
   
   change_direction();
 }
 
+void select_single_click_handler(ClickRecognizerRef recognizer, void *context) {
+   APP_LOG(APP_LOG_LEVEL_DEBUG,"Mach10");
+  DictionaryIterator *out_iter;
+
+// Prepare the outbox buffer for this message
+AppMessageResult result = app_message_outbox_begin(&out_iter);
+if(result == APP_MSG_OK) {
+  // Add an item to ask for weather data
+  int value = 9;
+  dict_write_int(out_iter, MESSAGE_KEY_RequestData, &value,sizeof(value),true);
+
+  // Send this message
+  result = app_message_outbox_send();
+  if(result != APP_MSG_OK) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending the outbox: %d", (int)result);
+  }
+} else {
+  // The outbox cannot be used right now
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Error preparing the outbox: %d", (int)result);
+}
+}
+
 void click_config_provider(void *context) {
   window_single_click_subscribe(BUTTON_ID_DOWN, down_single_click_handler);
   window_single_click_subscribe(BUTTON_ID_UP, up_single_click_handler);
+  window_single_click_subscribe(BUTTON_ID_SELECT, select_single_click_handler);
 }
 
 
